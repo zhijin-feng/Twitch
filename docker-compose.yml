@@ -1,0 +1,20 @@
+version: '3.8'
+#这也是一种configuration;
+
+services:
+  db:
+    image: mysql:latest #用最新版mysql;
+    environment:
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: twitch
+      MYSQL_ROOT_PASSWORD: secret
+      TZ: UTC
+    volumes:
+      - mysql-local:/var/lib/mysql #数据存在哪里;
+    ports:
+      - 3306:3306 #端口
+
+
+# permanent storage of data.
+volumes:
+  mysql-local: #虚拟硬盘的名字;
