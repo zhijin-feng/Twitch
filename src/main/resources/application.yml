@@ -1,0 +1,65 @@
+
+# 只包含non-null的field
+spring:
+  jackson:
+    default-property-inclusion: non_null
+#    Line 6-23: openFeign: 配置真正的openFeign:
+  cloud:
+    openfeign:
+      oauth2:
+        enabled: true
+#        line 12要对应line 26;
+        clientRegistrationId: twitch
+      client:
+        config:
+          twitch-api:
+#            五个api共有的属性：
+            url: https://api.twitch.tv/helix
+#            basic: 只打印request第一行：
+            loggerLevel: basic
+            default-request-headers:
+#             输入 client ID, 这里没有specify authorization，是因为它是动态的信息；
+#             每个api都要client ID; 所以这里需要输入client ID:
+              Client-Id: "jeibmhbda21kg8rinmwkw0d3o1sneu"
+#  OpenFeign: postman header
+  security:
+    oauth2:
+      client:
+        registration:
+          twitch:
+#            对应postman accesstoken里面的header;
+            authorization-grant-type: client_credentials
+#            postman authentication type;
+            client-authentication-method: client_secret_post
+#            输入client ID和secret:
+            client-id: "jeibmhbda21kg8rinmwkw0d3o1sneu"
+            client-secret: "vu3za2n4plas15gv82888ta7us27do"
+        provider:
+          twitch:
+#            postman accesstoken里面的url, 称为uri是规定的；
+            token-uri: https://id.twitch.tv/oauth2/token
+
+  datasource:
+    url: jdbc:mysql://${DATABASE_URL:localhost}:3306/twitch?createDatabaseIfNotExist=true
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:secret}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+        mode: always
+        schema-locations: "classpath:database-init.sql"
+  cache: #注意不要顶格,这是后端的cache,不是浏览器的；
+    caffeine:
+      spec: expireAfterWrite=1m #这个是TTL,1m代表1分钟，1个月是30 days;
+
+
+
+logging:
+  level:
+    org.apache.coyote.http11.Http11InputBuffer: DEBUG # Incoming HTTP requests
+    com.laioffer.twitch.external.TwitchApiClient: DEBUG
+    org.springframework.jdbc.core: DEBUG # SQL 根据repository显示sql的query
+
+
+
+
